@@ -75,7 +75,7 @@ docker compose down
 
 不要执行 `docker compose down -v`，它会删除账号数据卷。备份前停止服务，再复制数据卷中的完整数据库目录。容器数据与原生启动的 `data/` 目录相互独立，不会自动迁移已有账号。
 
-Compose 已设置宿主机 PID / 网络 / UTS 命名空间、只读宿主机根目录 `/host`、Docker Socket 和进程读取权限。CPU、内存、网络、监听端口、进程归属、系统名称与磁盘目录均读取宿主机，界面保留宿主机原始路径。容器根文件系统只读，仅数据库卷及临时目录可写。
+Compose 已设置宿主机 PID / 网络 / UTS 命名空间、只读宿主机根目录 `/host`、Docker Socket 和进程读取权限。CPU、内存、网络、监听端口、进程归属、系统名称与磁盘目录均读取宿主机，界面保留宿主机原始路径。容器根文件系统只读，仅数据库卷及临时目录可写。为读取宿主机其他用户的进程归属，使用 `SYS_PTRACE` / `DAC_READ_SEARCH`，并设置 `apparmor:unconfined`，避免 Ubuntu 等系统上的 Docker 默认 AppArmor 策略阻止读取宿主机进程。
 
 该部署方式面向 Linux 上的 rootful Docker Engine；Docker Desktop 监控的是其 Linux 虚拟机，rootless Docker 和用户命名空间重映射不作为完整宿主机监控的支持环境。默认 Socket 路径为 `/var/run/docker.sock`。启用 SELinux 的服务器需按本机策略允许所需读取；不要对 `/` 添加 `:z` 或 `:Z` 重标记。
 

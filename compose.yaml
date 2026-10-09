@@ -14,6 +14,8 @@ services:
     read_only: true
     security_opt:
       - no-new-privileges:true
+      # Docker's AppArmor profile blocks reading host processes outside its own profile.
+      - apparmor:unconfined
     cap_drop:
       - ALL
     cap_add:
