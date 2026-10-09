@@ -43,3 +43,19 @@ dark-mode
 ```
 
 仓库名保留 `kong`，使已有克隆地址和文档链接继续有效。README 的展示标题为「kong · Linux 服务器监控与 Docker 容器监控面板」。可以用 `user:luxunhe-wq server-monitoring` 或 `repo:luxunhe-wq/kong` 定位项目；搜索索引更新需要时间。
+
+## 使用管理员令牌填写
+
+相同内容保存在 `.github/repository-metadata.json`。也可以在本机运行下面的脚本，按提示输入令牌（输入不回显）：
+
+```bash
+python3 deploy/update_github_metadata.py
+```
+
+创建 GitHub fine-grained personal access token 时，只选择 `luxunhe-wq/kong` 仓库并授予 **Administration: Read and write**。令牌不需要源码写入或其他仓库权限。若由服务器代为执行，可以通过安全终端将令牌保存到仓库外、权限为 `600` 的文件，再运行：
+
+```bash
+python3 deploy/update_github_metadata.py --token-file /root/.config/kong/github-token
+```
+
+不要在聊天、Git 提交、截图或命令参数中公开令牌。脚本会验证管理员身份，再更新简介、项目主页和 Topics；配置文件本身不会自动修改 GitHub 的 About。

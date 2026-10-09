@@ -1,0 +1,26 @@
+{
+  "repository": "luxunhe-wq/kong",
+  "description": "轻量 Linux 服务器监控与 Docker 容器监控面板 | Lightweight Linux server monitoring dashboard: CPU, memory, disk, network, ports, disk usage analysis. Docker Compose, Python, dark mode, mobile UI.",
+  "homepage": "https://github.com/luxunhe-wq/kong#readme",
+  "topics": [
+    "linux",
+    "server-monitoring",
+    "system-monitor",
+    "monitoring",
+    "dashboard",
+    "docker",
+    "docker-compose",
+    "container-monitoring",
+    "cpu-monitoring",
+    "memory-monitoring",
+    "disk-usage",
+    "network-monitoring",
+    "port-monitoring",
+    "python",
+    "psutil",
+    "self-hosted",
+    "homelab",
+    "responsive-design",
+    "dark-mode"
+  ]
+}
