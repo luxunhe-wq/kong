@@ -1,0 +1,21 @@
+[Unit]
+Description=kong server resource monitor
+After=network.target docker.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/kong
+ExecStart=/usr/bin/python3 /opt/kong/server.py --host 0.0.0.0 --port 8080
+Restart=on-failure
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+Environment=KONG_DATA_DIR=/var/lib/kong
+StateDirectory=kong
+StateDirectoryMode=0700
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

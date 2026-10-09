@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111b24">
+  <meta name="description" content="kong — 轻量、实时、优雅的服务器资源监控">
+  <title>kong · 服务器监控</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css?v=1.3.1">
+  <link rel="stylesheet" href="/auth.css?v=1.1.0">
+  <link rel="stylesheet" href="/resources.css?v=1.3.0">
+  <link rel="stylesheet" href="/ports.css?v=1.3.0">
+  <script src="/app.js?v=1.3.2" defer></script>
+  <script src="/resources.js?v=1.3.0" defer></script>
+  <script src="/ports.js?v=1.3.0" defer></script>
+  <script src="/auth.js?v=1.3.2" defer></script>
+</head>
+<body>
+  <svg class="icon-library" aria-hidden="true"><defs>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18M6 15l4-5 4 3 6-8"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><path d="m12 3 9 5v9l-9 5-9-5V8l9-5Zm0 10v9M3 8l9 5 9-5M7.5 5.5l9 5"/></symbol>
+    <symbol id="i-process" viewBox="0 0 24 24"><path d="M3 7h18M3 12h18M3 17h18"/><circle cx="7" cy="7" r="2"/><circle cx="16" cy="12" r="2"/><circle cx="10" cy="17" r="2"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="m9 3-1 3-3 1-2 4 2 2v4l3 2 3-1 3 1 3-2v-4l2-2-2-4-3-1-1-3Z"/><circle cx="11" cy="12" r="3"/></symbol>
+    <symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="7" rx="2"/><rect x="3" y="14" width="18" height="7" rx="2"/><path d="M7 6.5h.01M7 17.5h.01M12 6.5h5M12 17.5h5"/></symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M9 2v4m6-4v4M9 18v4m6-4v4M2 9h4m-4 6h4m12-6h4m-4 6h4"/></symbol>
+    <symbol id="i-memory" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M5 18v3m4-3v3m6-3v3m4-3v3M6 10v4m4-4v4m4-4v4m4-4v4"/></symbol>
+    <symbol id="i-disk" viewBox="0 0 24 24"><path d="m5 4-3 11v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4L19 4Z"/><path d="M2 15h20M16 18h.01m3 0h.01"/></symbol>
+    <symbol id="i-network" viewBox="0 0 24 24"><path d="M8 3v16m-4-4 4 4 4-4M16 21V5m-4 4 4-4 4 4"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 8-3 8-3 10h18c0-2-3-2-3-10M10 22h4"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-2l2 3M4 16l2 3a7 7 0 0 0 12-2"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 15A9 9 0 0 1 9 4a9 9 0 1 0 11 11Z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 3h7v7M21 3l-11 11M10 3H3v18h18v-7"/></symbol>
+  </defs></svg>
+
+  <section class="auth-screen" id="auth-screen" aria-label="账户登录">
+    <div class="auth-story"><a class="brand" href="/" aria-label="kong 首页"><span class="brand-mark">k</span><span>kong<span class="brand-period">.</span></span><small>MONITOR</small></a><div class="auth-story-copy"><div class="eyebrow"><span class="dot"></span> LESS SETUP. MORE INSIGHT.</div><h1>你的服务器，<br>尽在掌握<span>.</span></h1><p>从系统资源到 Docker 容器，<br>一个轻量面板，看清每一刻运行状态。</p><div class="auth-preview"><div class="auth-preview-heading"><span><span class="dot pulse"></span> SERVER OVERVIEW</span><span>kong.</span></div><div class="auth-preview-bars" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><div class="auth-preview-footer"><span>CPU & MEMORY</span><span>随时了解 · 从容管理</span></div></div><div class="auth-story-tags"><span>轻量部署</span><span>实时洞察</span><span>移动友好</span></div></div><div class="auth-story-footer">小而轻，清晰可见。<span>SELF-HOSTED / YOUR DATA</span></div></div>
+    <div class="auth-form-side"><div class="auth-form-card" id="auth-panel"><div class="loading-state"><span class="loading-spinner"></span><strong>正在连接 kong</strong></div></div><p class="auth-form-footer">属于你的服务器，也属于你的工作空间。</p></div>
+  </section>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="#overview" aria-label="kong 首页"><span class="brand-mark">k<span></span></span><span>kong<span class="brand-period">.</span></span><small>MONITOR</small></a>
+    <div class="workspace"><span class="workspace-icon"><svg class="icon"><use href="#i-server"/></svg></span><div><strong>我的服务器</strong><span>Personal workspace</span></div><span class="workspace-dot"></span></div>
+    <div class="nav-label">工作空间</div>
+    <nav aria-label="主导航">
+      <a href="#overview" data-page="overview" class="nav-item active"><svg class="icon"><use href="#i-grid"/></svg><span>概览</span><span class="nav-active-dot"></span></a>
+      <a href="#resources" data-page="resources" class="nav-item"><svg class="icon"><use href="#i-chart"/></svg><span>资源监控</span></a>
+      <a href="#docker" data-page="docker" class="nav-item"><svg class="icon"><use href="#i-box"/></svg><span>Docker 容器</span><span class="nav-count" id="nav-docker-count">—</span></a>
+      <a href="#ports" data-page="ports" class="nav-item"><svg class="icon"><use href="#i-network"/></svg><span>端口管理</span></a>
+    </nav>
+    <div class="nav-label nav-label-system">偏好设置</div>
+    <a href="#settings" data-page="settings" class="nav-item"><svg class="icon"><use href="#i-settings"/></svg><span>设置</span></a>
+    <div class="sidebar-bottom">
+      <div class="sidebar-note"><div class="sidebar-note-icon"><svg class="icon"><use href="#i-chart"/></svg><span>保持洞察，从容掌控</span></div><p>每一个指标，都在实时更新。<br>让服务器的运行一目了然。</p><span class="note-tag"><span class="dot"></span> LIVE MONITORING</span></div>
+      <div class="sidebar-profile"><div class="avatar" data-user-avatar>K</div><div><strong id="profile-username">—</strong><span id="profile-role">—</span></div><button class="icon-button" id="logout-button" aria-label="退出登录" title="退出登录"><svg class="icon"><use href="#i-external"/></svg></button></div>
+    </div>
+  </aside>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="breadcrumb"><button class="icon-button mobile-menu" id="menu-button" aria-label="打开导航" aria-controls="sidebar" aria-expanded="false"><svg class="icon"><use href="#i-menu"/></svg></button><svg class="icon breadcrumb-home"><use href="#i-server"/></svg><span>工作空间</span><svg class="icon breadcrumb-chevron"><use href="#i-chevron"/></svg><strong id="breadcrumb-page">概览</strong></div>
+      <div class="topbar-actions"><span class="today" id="today"></span><span class="topbar-divider"></span><button class="icon-button" id="search-button" aria-label="搜索页面、容器与端口" title="搜索 · Ctrl K"><svg class="icon"><use href="#i-search"/></svg></button><div class="notification-wrap"><button class="icon-button notification-button" id="notification-button" aria-label="资源状态通知" aria-expanded="false"><svg class="icon"><use href="#i-bell"/></svg><span id="notification-dot" hidden></span></button><div class="notification-popover" id="notification-popover" hidden></div></div><a class="top-avatar" data-user-avatar href="#settings" aria-label="账户设置">K</a></div>
+    </header>
+
+    <main id="main">
+      <div class="page-heading"><div><div class="eyebrow"><span class="dot"></span> YOUR SERVER, AT A GLANCE</div><h1 id="page-title">服务器概览<span class="heading-dot">.</span></h1><p id="page-description">一览运行状态，让每一份资源都心中有数。</p></div><div class="heading-actions"><span class="live-pill" id="connection-status"><span class="dot pulse"></span> 实时监控中</span><button class="button button-secondary" id="export-button"><svg class="icon"><use href="#i-download"/></svg>导出报告</button></div></div>
+      <div id="connection-error" class="connection-error" role="alert" hidden></div>
+      <div id="loading" class="loading-state"><span class="loading-spinner"></span><strong>正在连接服务器</strong><p>读取真实的资源与容器数据…</p></div>
+      <div id="page-content" hidden></div>
+      <footer class="page-footer"><span><span class="footer-brand">kong.</span> 小而轻，清晰可见。</span><span id="last-updated">等待首次采集</span></footer>
+    </main>
+  </div>
+
+  <dialog id="search-dialog" class="search-dialog"><div class="search-dialog-input"><svg class="icon"><use href="#i-search"/></svg><input id="global-search" placeholder="搜索页面、端口或运行服务…" autocomplete="off" aria-label="全局搜索"><button class="key" id="search-close">ESC</button></div><div class="search-results" id="search-results"></div><div class="search-dialog-footer">快速找到你关心的资源 <span>kong / search</span></div></dialog>
+  <dialog id="detail-dialog" class="detail-dialog"><div id="detail-content"></div></dialog>
+  <div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>

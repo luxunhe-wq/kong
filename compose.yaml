@@ -1,0 +1,51 @@
+name: kong
+
+services:
+  kong:
+    image: ${KONG_IMAGE:-kong:local}
+    build:
+      context: .
+    restart: unless-stopped
+    init: true
+    # Linux host namespaces are required for host network rates, ports and process attribution.
+    network_mode: host
+    pid: host
+    uts: host
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - DAC_READ_SEARCH
+      - SYS_PTRACE
+    environment:
+      KONG_HOST: ${KONG_HOST:-0.0.0.0}
+      KONG_PORT: ${KONG_PORT:-8080}
+      KONG_HOST_ROOT: /host
+      KONG_DATA_DIR: /var/lib/kong
+      KONG_SECURE_COOKIE: ${KONG_SECURE_COOKIE:-0}
+    volumes:
+      - type: bind
+        source: /
+        target: /host
+        read_only: true
+        bind:
+          propagation: rslave
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+        read_only: true
+        bind:
+          create_host_path: false
+      - kong-data:/var/lib/kong
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+volumes:
+  kong-data:
