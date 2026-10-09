@@ -8,10 +8,10 @@
 
 ## 快速安装
 
-推荐在 Linux 服务器上使用 Docker Engine 和 Docker Compose 插件。下面的 `YOUR_GITHUB_USERNAME` 是 GitHub 用户名，请替换为实际仓库所有者；仓库发布前请勿将示例地址当作已经可用的下载地址。
+推荐在 Linux 服务器上使用 Docker Engine 和 Docker Compose 插件。项目仓库：https://github.com/luxunhe-wq/kong 。拉取源码后执行以下命令：
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/kong.git
+git clone https://github.com/luxunhe-wq/kong.git
 cd kong
 docker compose up -d --build
 ```
@@ -96,7 +96,7 @@ docker push YOUR_ACCOUNT/kong:1.0.0
 KONG_IMAGE=YOUR_ACCOUNT/kong:1.0.0 docker compose up -d --no-build --pull always
 ```
 
-也可将 `KONG_IMAGE=YOUR_ACCOUNT/kong:1.0.0` 写入同目录的 `.env`，以后执行相同命令即可拉取更新并重建容器。私有镜像需先 `docker login`。项目尚未配置公开镜像仓库地址。
+也可将 `KONG_IMAGE=YOUR_ACCOUNT/kong:1.0.0` 写入同目录的 `.env`，以后执行相同命令即可拉取更新并重建容器。私有镜像需先 `docker login`。本项目的 GHCR 发布地址和操作见下文；镜像发布前请使用源码构建方式。
 
 也可通过离线镜像包分发，无需镜像仓库。发布者导出镜像：
 
@@ -111,7 +111,7 @@ docker load -i kong-image-linux-amd64.tar.gz
 docker compose up -d --no-build --pull never
 ```
 
-离线包仅支持构建时的 CPU 架构，文件名应与实际架构一致。本次构建为 Linux amd64。
+离线包仅支持构建时的 CPU 架构，文件名应与实际架构一致；上面的文件名适用于 Linux amd64 构建。
 
 Dockerfile 支持通过 Buildx 构建 Linux amd64 / arm64 镜像；多架构发布示例：
 
@@ -123,15 +123,15 @@ docker buildx build --platform linux/amd64,linux/arm64 -t YOUR_ACCOUNT/kong:1.0.
 
 项目包含自动测试工作流，以及发布到 GitHub Container Registry（GHCR）的多架构工作流。仓库维护者可在 GitHub 的 **Actions → Publish Docker image → Run workflow** 手动构建发布，或推送 `v1.0.0` 这样的版本标签触发发布。
 
-工作流使用 GitHub 自动提供的 `GITHUB_TOKEN`，不需要在项目中保存密码或个人令牌。发布目标为 `ghcr.io/仓库所有者/仓库名`（全小写），包含 `linux/amd64` 和 `linux/arm64`。首次发布后，在 GitHub 的 Packages 设置中将镜像包设为公开，其他人才能免登录拉取。源码仓库公开不代表镜像包自动公开。
+工作流使用 GitHub 自动提供的 `GITHUB_TOKEN`，不需要在项目中保存密码或个人令牌。发布目标为 `ghcr.io/luxunhe-wq/kong`，包含 `linux/amd64` 和 `linux/arm64`。首次发布后，在 GitHub 的 Packages 设置中将镜像包设为公开，其他人才能免登录拉取。源码仓库公开不代表镜像包自动公开。
 
-**完成发布并设为公开后**，用户可以只下载 Compose 文件并启动，无需本机构建（地址中的 `YOUR_GITHUB_USERNAME` 需替换，镜像路径使用小写）：
+**完成发布并设为公开后**，用户可以只下载 Compose 文件并启动，无需本机构建：
 
 ```bash
 mkdir -p kong
 cd kong
-curl -fL https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/kong/main/compose.yaml -o compose.yaml
-KONG_IMAGE=ghcr.io/your_github_username/kong:latest docker compose up -d --no-build --pull always
+curl -fL https://raw.githubusercontent.com/luxunhe-wq/kong/main/compose.yaml -o compose.yaml
+KONG_IMAGE=ghcr.io/luxunhe-wq/kong:latest docker compose up -d --no-build --pull always
 ```
 
 默认访问 `http://服务器IP:8080`。如需更改端口，可在启动命令前再加 `KONG_PORT=9090`。建议将实际 `KONG_IMAGE` 和 `KONG_PORT` 保存到同目录 `.env`，以后更新执行 `docker compose up -d --no-build --pull always` 即可。镜像发布前请使用源码构建方式；ARM64 构建成功并不等同于已经在 ARM64 实机上验证全部监控功能。
