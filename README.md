@@ -1,10 +1,66 @@
-# kong
+# kong · Linux 服务器监控与 Docker 容器监控面板
 
-轻量、实时的服务器监控系统。深色侧栏搭配浅色仪表盘，支持深色主题和手机布局。全部指标来自当前服务器，没有模拟数据，也不依赖外部 CDN。
+[![Tests](https://github.com/luxunhe-wq/kong/actions/workflows/ci.yml/badge.svg)](https://github.com/luxunhe-wq/kong/actions/workflows/ci.yml)
+[![Docker Compose](https://img.shields.io/badge/deploy-Docker%20Compose-2496ED?logo=docker&logoColor=white)](#快速安装)
+[![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](#python-直接启动)
+
+**轻量的 Linux 服务器监控面板：实时查看 CPU、内存、磁盘、网络、Docker 容器和监听端口。** 支持 Docker Compose 部署、磁盘目录占用分析、管理员与成员账号、深色主题和手机布局。全部指标来自实际采集，前端不依赖外部 CDN。
+
+**A lightweight Linux server monitoring dashboard with real-time CPU, memory, disk, network, Docker container and port monitoring.** Built with Python, psutil and a native web UI. Deploy with Docker Compose; includes disk usage analysis, account management, dark mode and a responsive mobile dashboard.
 
 **为什么选择 kong？** 如果你维护一台个人服务器或几台小型服务器，希望用手机随时查看系统和 Docker 的运行状态，kong 提供一个安装简单、界面清晰、自带账户管理的本机监控面板。运行依赖只有 psutil，无需 Node.js、外部数据库或单独部署指标服务。
 
 目前专注单机实时监控，历史保留 1 小时；多服务器汇总、长期时序存储和外部告警推送尚未实现。
+
+## 页面预览
+
+以下是实际运行页面的截图，CPU、内存、网络和 Docker 数据来自截图时的服务器，未模拟指标。主机名已遮盖，目录分析使用临时创建的真实文件；截图账户为独立临时账户。深色、浅色和移动端均为项目原有界面。
+
+### 服务器概览
+
+CPU、内存、磁盘与网络卡片，搭配实时趋势、系统信息和 Docker 状态。
+
+![kong Linux 服务器监控面板：CPU、内存、磁盘、网络与 Docker 实时概览](docs/screenshots/overview-light.png)
+
+<details>
+<summary>查看深色主题</summary>
+
+![kong 深色服务器监控仪表盘](docs/screenshots/overview-dark.png)
+
+</details>
+
+### Docker 容器监控
+
+查看运行状态、CPU、内存、网络 I/O 和进程数，支持搜索、筛选和容器详情。
+
+![Docker 容器监控：运行状态和资源用量](docs/screenshots/docker.png)
+
+### 磁盘占用分析与内存排查
+
+按目录定位磁盘占用，查看大文件；内存详情提供用量趋势、Swap 与进程排行。
+
+![Linux 磁盘目录分析：目录排行、大文件与占用空间](docs/screenshots/disk-analysis.png)
+
+<details>
+<summary>查看内存监控与进程排行</summary>
+
+![Linux 内存监控：内存趋势、Swap 与进程占用排行](docs/screenshots/memory.png)
+
+</details>
+
+### 手机查看服务器状态
+
+<img src="docs/screenshots/overview-mobile.png" width="360" alt="kong 移动端服务器监控：手机查看 CPU、内存、磁盘和网络实时数据">
+
+## 部署方式
+
+| 方式 | 使用者需要什么 | 启动方式 |
+| --- | --- | --- |
+| 拉取源码并构建 | Git、Docker Engine、Docker Compose | `docker compose up -d --build` |
+| 拉取已发布镜像 | Docker Engine、Docker Compose、`compose.yaml` | 配置 `KONG_IMAGE` 后使用 `--no-build --pull always` |
+| Python 直接运行 | Python 3.9+、psutil；Docker 监控还需 Docker CLI | `python3 server.py` |
+
+**现在即可使用源码构建部署。** GHCR 镜像需先完成发布并设为公开，镜像拉取步骤见 [GitHub Actions 发布镜像](#github-actions-发布镜像)。默认网页端口为 **8080**。
 
 ## 快速安装
 
