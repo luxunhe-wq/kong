@@ -1,6 +1,6 @@
 # MoniLite · Linux 服务器监控与 Docker 容器监控面板
 
-[![Tests](https://github.com/luxunhe-wq/kong/actions/workflows/ci.yml/badge.svg)](https://github.com/luxunhe-wq/kong/actions/workflows/ci.yml)
+[![Tests](https://github.com/luxunhe-wq/MoniLite/actions/workflows/ci.yml/badge.svg)](https://github.com/luxunhe-wq/MoniLite/actions/workflows/ci.yml)
 [![Docker Compose](https://img.shields.io/badge/deploy-Docker%20Compose-2496ED?logo=docker&logoColor=white)](#快速安装)
 [![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](#python-直接启动)
 
@@ -64,10 +64,10 @@ CPU、内存、磁盘与网络卡片，搭配实时趋势、系统信息和 Dock
 
 ## 快速安装
 
-推荐在 Linux 服务器上使用 Docker Engine 和 Docker Compose 插件。项目仓库：https://github.com/luxunhe-wq/kong 。项目已更名为 MoniLite，仓库地址中的旧名称暂时保留，待管理员在 GitHub Settings 中改名。拉取源码后执行以下命令：
+推荐在 Linux 服务器上使用 Docker Engine 和 Docker Compose 插件。项目仓库：https://github.com/luxunhe-wq/MoniLite 。项目与 GitHub 仓库名称均为 MoniLite。拉取源码后执行以下命令：
 
 ```bash
-git clone https://github.com/luxunhe-wq/kong.git MoniLite
+git clone https://github.com/luxunhe-wq/MoniLite.git MoniLite
 cd MoniLite
 docker compose up -d --build
 ```
@@ -188,7 +188,7 @@ docker buildx build --platform linux/amd64,linux/arm64 -t YOUR_ACCOUNT/monilite:
 ```bash
 mkdir -p MoniLite
 cd MoniLite
-curl -fL https://raw.githubusercontent.com/luxunhe-wq/kong/main/compose.yaml -o compose.yaml
+curl -fL https://raw.githubusercontent.com/luxunhe-wq/MoniLite/main/compose.yaml -o compose.yaml
 MONILITE_IMAGE=ghcr.io/luxunhe-wq/monilite:latest docker compose up -d --no-build --pull always
 ```
 

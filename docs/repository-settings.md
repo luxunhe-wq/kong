@@ -2,7 +2,7 @@
 
 README 标题与正文已包含中英文功能介绍。GitHub 的仓库搜索还使用仓库简介和 Topics；这些信息需要仓库管理员在仓库首页的 About 区域编辑。部署密钥只能推送 Git 内容，不能修改这些管理设置。关键词可以提升相关性，但不能保证搜索排名或立即收录。
 
-仓库：https://github.com/luxunhe-wq/kong
+仓库：https://github.com/luxunhe-wq/MoniLite
 
 点击仓库首页右侧 **About → 齿轮图标**，填写以下内容并保存。
 
@@ -15,7 +15,7 @@ MoniLite · 轻量 Linux 服务器监控与 Docker 容器监控面板 | Lightwei
 **Website（项目主页）**
 
 ```text
-https://github.com/luxunhe-wq/kong#readme
+https://github.com/luxunhe-wq/MoniLite#readme
 ```
 
 **Topics（逐个添加）**
@@ -43,7 +43,7 @@ responsive-design
 dark-mode
 ```
 
-项目名称为 `MoniLite`，当前仓库地址仍是 `luxunhe-wq/kong`。仓库管理员在 **Settings → General → Repository name** 中把旧名称 `kong` 改成 `MoniLite` 后，GitHub 会为旧克隆地址提供重定向；建议使用新地址。README 的展示标题为「MoniLite · Linux 服务器监控与 Docker 容器监控面板」。可以用 `user:luxunhe-wq server-monitoring` 或 `repo:luxunhe-wq/kong` 定位项目；搜索索引更新需要时间。
+项目和仓库已改名为 `MoniLite`。GitHub 为旧版 `kong` 仓库的克隆地址提供重定向；建议使用新地址。README 的展示标题为「MoniLite · Linux 服务器监控与 Docker 容器监控面板」。可以用 `user:luxunhe-wq server-monitoring` 或 `repo:luxunhe-wq/MoniLite` 定位项目；搜索索引更新需要时间。
 
 ## 使用管理员令牌填写
 
@@ -53,7 +53,7 @@ dark-mode
 python3 deploy/update_github_metadata.py
 ```
 
-创建 GitHub fine-grained personal access token 时，只选择 `luxunhe-wq/kong` 仓库（仓库改名后选择新名称）并授予 **Administration: Read and write**。令牌不需要源码写入或其他仓库权限。若由服务器代为执行，可以通过安全终端将令牌保存到仓库外、权限为 `600` 的文件，再运行：
+创建 GitHub fine-grained personal access token 时，只选择 `luxunhe-wq/MoniLite` 仓库并授予 **Administration: Read and write**。令牌不需要源码写入或其他仓库权限。若由服务器代为执行，可以通过安全终端将令牌保存到仓库外、权限为 `600` 的文件，再运行：
 
 ```bash
 python3 deploy/update_github_metadata.py --token-file /root/.config/monilite/github-token
@@ -61,4 +61,4 @@ python3 deploy/update_github_metadata.py --token-file /root/.config/monilite/git
 
 不要在聊天、Git 提交、截图或命令参数中公开令牌。脚本会验证管理员身份，再更新简介、项目主页和 Topics；配置文件本身不会自动修改 GitHub 的 About。
 
-仓库改名后，将 `.github/repository-metadata.json` 中的 `repository` 改为 `luxunhe-wq/MoniLite`、`homepage` 改为 `https://github.com/luxunhe-wq/MoniLite#readme`，并更新 README 和界面项目入口中的仓库链接。原链接在 GitHub 重定向期间仍可使用。
+仓库改名后的 README、界面入口和 `.github/repository-metadata.json` 已使用新地址。原链接在 GitHub 重定向期间仍可使用。

@@ -18,7 +18,7 @@ MoniLite 默认仍监听 **8080**。新版界面和部署文件采用 MoniLite �
 2. 更新源码与 Git 远程地址（项目本地文件夹名称可以保持原样）：
 
    ```bash
-   git remote set-url origin https://github.com/luxunhe-wq/kong.git
+   git remote set-url origin https://github.com/luxunhe-wq/MoniLite.git
    git pull --ff-only
    ```
 
