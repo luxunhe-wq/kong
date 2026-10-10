@@ -257,6 +257,10 @@ systemctl status monilite
 journalctl -u monilite -f
 ```
 
+更新源码后需要重启后端：systemd 部署执行 `sudo systemctl restart monilite`（沿用旧服务名时执行 `sudo systemctl restart kong`）；Docker 部署执行 `docker compose up -d --build`。只刷新浏览器不会让 Python 进程重新加载后端代码。
+
+监控接口和文本静态资源支持 gzip 压缩。浏览器获取监控数据的超时为 30 秒，适用于较慢连接及 Tailscale 中继访问；临时断网或恢复前台后会自动重试。失败时页面会显示超时、网络请求失败或接口状态，便于判断问题。服务健康状态可通过 `/api/health` 查看。
+
 需要本机和 Docker 读取权限。首次初始化在可信网络完成。公网部署使用 HTTPS 反向代理，保持原始 Host 头，并设置 `MONILITE_SECURE_COOKIE=1` 以启用 Secure Cookie；仅使用 HTTP 时不要开启此项。也可以仅监听 `127.0.0.1` 并通过 SSH 隧道访问。按部署需要放行 TCP 8080。
 
 ## API 与验证

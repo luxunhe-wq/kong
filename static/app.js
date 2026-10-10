@@ -17,7 +17,7 @@ const pages = {
   settings: {title:'偏好设置', breadcrumb:'设置', description:'调整监控节奏，打造习惯的工作空间。', icon:'settings'},
 };
 const state = {page:'overview', data:null, seconds:300, dockerFilter:'all', dockerSearch:'', portSearch:'', portFilter:'all', portScope:'any', portDirection:1, timer:null, fetching:false, failed:false, user:null, csrf:null, authGeneration:0, settingsTab:'preferences', resourceTab:'cpu', storagePath:'/' };
-const metricsTimeout = 8000;
+const metricsTimeout = 30000;
 state.metricsController = null;
 state.metricsStartedAt = 0;
 document.body.classList.toggle('dark', preferences.theme === 'dark');
@@ -284,6 +284,7 @@ async function fetchData() {
   state.metricsController=controller;state.metricsStartedAt=Date.now();
   const isCurrent=()=>generation===state.authGeneration && state.metricsController===controller;
   let requestTimeout;
+  let rendering=false;
   try {
     requestTimeout=setTimeout(()=>controller.abort(),metricsTimeout);
     const response=await fetch(`/api/metrics?seconds=${state.seconds}`,{cache:'no-store',signal:controller.signal});
@@ -292,6 +293,7 @@ async function fetchData() {
     if(!response.ok)throw new Error(`HTTP ${response.status}`);
     const data=await response.json();
     if(!isCurrent())return false;
+    rendering=true;
     const first=!state.data;state.data=data;state.failed=false;
     $('#connection-error').hidden=true;
     if(first)renderPage();else updatePage();
@@ -299,9 +301,11 @@ async function fetchData() {
   } catch(error) {
     if(!isCurrent() || !state.user)return false;
     state.failed=true;
-    $('#connection-error').textContent=`无法连接监控服务${state.data?'，当前显示上一次采集的数据':''}。${preferences.autoRefresh?'正在自动重试…':'请手动刷新页面重试。'}`;
+    const reason=rendering?'监控数据处理失败':error.name==='AbortError'?'请求超时，网络响应较慢':error instanceof TypeError?'网络请求失败':error instanceof SyntaxError?'服务器返回的数据无法解析':/^HTTP \d+$/.test(error.message)?`监控接口返回 ${error.message}`:'监控数据处理失败';
+    console.error('MoniLite metrics request failed:', error);
+    $('#connection-error').textContent=`无法获取监控数据（${reason}）${state.data?'，当前显示上一次采集的数据':''}。${preferences.autoRefresh?'正在自动重试…':'请手动刷新页面重试。'}`;
     $('#connection-error').hidden=false;
-    if(!state.data)$('#loading').innerHTML=`${icon('server')}<strong>暂时无法连接服务器</strong><p>请确认 MoniLite 服务已启动${preferences.autoRefresh?'，系统会自动重试。':'。'}</p>`;
+    if(!state.data)$('#loading').innerHTML=`${icon('server')}<strong>暂时无法获取监控数据</strong><p>${reason}。${preferences.autoRefresh?'系统会自动重试，请稍候。':'请检查连接后重试。'}</p>`;
     updateStatus();return false;
   } finally {
     clearTimeout(requestTimeout);

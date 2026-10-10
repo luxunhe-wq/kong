@@ -2,6 +2,7 @@
 """MoniLite · A small, read-only Linux server monitor."""
 import argparse
 import copy
+import gzip
 import json
 import hmac
 import mimetypes
@@ -330,7 +331,7 @@ def make_handler(monitor, auth, storage=None):
                 except ValueError:
                     self.send_json({"error": "seconds must be an integer"}, 400)
                     return
-                self.send_json(monitor.snapshot(seconds))
+                self.send_json(monitor.snapshot(seconds), compress=True)
                 return
             if parsed.path == "/api/admin/users":
                 try:
@@ -362,11 +363,15 @@ def make_handler(monitor, auth, storage=None):
                 self.send_error(404)
                 return
             content = file.read_bytes()
+            content, encoding = self.response_body(content, file.suffix in (".html", ".js", ".css", ".svg"))
             self.send_response(200)
             self.headers_common()
             self.send_header("Content-Type", (mimetypes.guess_type(str(file))[0] or "application/octet-stream") + ("; charset=utf-8" if file.suffix in (".html", ".js", ".css") else ""))
             self.send_header("Content-Length", str(len(content)))
             self.send_header("Cache-Control", "no-cache")
+            self.send_header("Vary", "Accept-Encoding")
+            if encoding:
+                self.send_header("Content-Encoding", encoding)
             self.end_headers()
             self.wfile.write(content)
 
@@ -441,13 +446,36 @@ def make_handler(monitor, auth, storage=None):
             self.send_header("Referrer-Policy", "same-origin")
             self.send_header("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'")
 
-        def send_json(self, data, status=200, cookie=None):
+        def response_body(self, content, compress):
+            if compress and len(content) >= 1024:
+                encodings = {}
+                for entry in self.headers.get("Accept-Encoding", "").lower().split(","):
+                    name, *parameters = entry.strip().split(";")
+                    quality = 1.0
+                    for parameter in parameters:
+                        key, separator, value = parameter.strip().partition("=")
+                        if key == "q" and separator:
+                            try:
+                                quality = float(value)
+                            except ValueError:
+                                quality = 0.0
+                    encodings[name.strip()] = quality
+                if 0 < encodings.get("gzip", encodings.get("*", 0)) <= 1:
+                    return gzip.compress(content, compresslevel=5, mtime=0), "gzip"
+            return content, None
+
+        def send_json(self, data, status=200, cookie=None, compress=False):
             content = json.dumps(data, ensure_ascii=False, allow_nan=False).encode()
+            content, encoding = self.response_body(content, compress)
             self.send_response(status)
             self.headers_common()
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Content-Length", str(len(content)))
             self.send_header("Cache-Control", "no-store")
+            if compress:
+                self.send_header("Vary", "Accept-Encoding")
+            if encoding:
+                self.send_header("Content-Encoding", encoding)
             if cookie:
                 # Clear the legacy cookie on login, password changes and logout.
                 self.send_header("Set-Cookie", "kong_session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0")

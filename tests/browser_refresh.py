@@ -50,10 +50,36 @@ def main():
         expect(page.locator('.metric-card')).to_have_count(4)
         page.evaluate('window.refreshSentinel = true')
 
+        # A slow but healthy connection must not be aborted by the previous 8-second limit.
+        page.wait_for_function('() => !state.fetching')
+        page.evaluate("""() => {
+          clearTimeout(state.timer);
+          window.nativeFetch=window.fetch;
+          window.fetch=(url, options) => String(url).startsWith('/api/metrics?')
+            ? new Promise(resolve => setTimeout(resolve, 9000)).then(() => nativeFetch(url, options))
+            : nativeFetch(url, options);
+          window.slowResult=fetchData();
+        }""")
+        assert page.evaluate('window.slowResult') is True
+        assert page.evaluate('!state.failed')
+        page.evaluate('window.fetch=nativeFetch;scheduleRefresh()')
+        print('A healthy response delayed by 9 seconds renders successfully.', flush=True)
+
+        # A rendering failure must not be reported as a network failure.
+        page.evaluate("""() => {
+          clearTimeout(state.timer);
+          window.nativeUpdatePage=updatePage;
+          updatePage=()=>{throw new TypeError('simulated rendering failure');};
+        }""")
+        assert page.evaluate('fetchData()') is False
+        expect(page.locator('#connection-error')).to_contain_text('监控数据处理失败')
+        page.evaluate('updatePage=nativeUpdatePage;scheduleRefresh()')
+        assert page.evaluate('fetchData()') is True
+
         # A suspended request may never settle, even after abort. The timer must still retry.
         hold_metrics(page)
         page.evaluate('scheduleRefresh()')
-        page.wait_for_function('() => heldMetrics.length === 2', timeout=14000)
+        page.wait_for_function('() => heldMetrics.length === 2', timeout=40000)
         assert page.evaluate('heldMetrics[0].signal.aborted')
         assert page.evaluate('state.fetching && !heldMetrics[1].signal.aborted')
         # A late response from the abandoned request must neither overwrite data nor unlock its successor.

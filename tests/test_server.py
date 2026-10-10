@@ -1,4 +1,5 @@
 import json
+import gzip
 import threading
 import time
 import unittest
@@ -54,6 +55,30 @@ class MonitorTests(unittest.TestCase):
         snapshot["history"][0]["cpu"] = -1
         self.assertEqual(self.monitor.current["memory"]["total"], original)
         self.assertGreaterEqual(self.monitor.history[0]["cpu"], 0)
+
+    def test_metrics_compression_and_encoding_negotiation(self):
+        with urlopen(Request(self.base + "/api/metrics", headers={"Cookie": self.cookie})) as response:
+            plain = response.read()
+            self.assertIsNone(response.headers.get("Content-Encoding"))
+        for encoding in ("gzip", "br, GZip ; q=0.5"):
+            with self.subTest(encoding=encoding), urlopen(Request(self.base + "/api/metrics", headers={"Cookie": self.cookie, "Accept-Encoding": encoding})) as response:
+                compressed = response.read()
+                self.assertEqual(response.headers["Content-Encoding"], "gzip")
+                self.assertEqual(response.headers["Vary"], "Accept-Encoding")
+                self.assertEqual(int(response.headers["Content-Length"]), len(compressed))
+            self.assertEqual(json.loads(gzip.decompress(compressed)), json.loads(plain))
+            self.assertLess(len(compressed), len(plain))
+        for encoding in ("gzip;q=0, *;q=1", "gzip;q=invalid", "br"):
+            with self.subTest(encoding=encoding), urlopen(Request(self.base + "/api/metrics", headers={"Cookie": self.cookie, "Accept-Encoding": encoding})) as response:
+                self.assertIsNone(response.headers.get("Content-Encoding"))
+                self.assertEqual(json.load(response), json.loads(plain))
+
+    def test_compressed_javascript_preserves_source(self):
+        with urlopen(Request(self.base + "/app.js", headers={"Accept-Encoding":"gzip"})) as response:
+            self.assertEqual(response.headers["Content-Encoding"], "gzip")
+            content = gzip.decompress(response.read())
+        with urlopen(self.base + "/app.js") as response:
+            self.assertEqual(content, response.read())
 
     def test_bind_mounts_do_not_duplicate_storage(self):
         from types import SimpleNamespace
