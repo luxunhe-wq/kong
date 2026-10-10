@@ -1,4 +1,4 @@
-"""Translate host paths when kong runs with the Linux host mounted at /host."""
+"""Translate host paths when MoniLite runs with the Linux host mounted at /host."""
 import os
 import pwd
 import re
@@ -12,10 +12,10 @@ import psutil
 
 class HostSystem:
     def __init__(self, root=None):
-        configured = os.environ.get("KONG_HOST_ROOT", "") if root is None else root
+        configured = os.environ.get("MONILITE_HOST_ROOT", os.environ.get("KONG_HOST_ROOT", "")) if root is None else root
         self.root = Path(configured).resolve(strict=True) if configured else None
         if self.root is not None and not self.root.is_dir():
-            raise ValueError("KONG_HOST_ROOT must be a mounted host directory")
+            raise ValueError("MONILITE_HOST_ROOT must be a mounted host directory")
         self.users = {}
         if self.root is not None:
             try:
@@ -97,6 +97,6 @@ def configure_host():
     if host.root is not None:
         proc = host.path("/proc")
         if not (proc / "stat").is_file() or not (proc / "1/mounts").is_file():
-            raise ValueError("KONG_HOST_ROOT must include the host /proc; use the provided Compose configuration")
+            raise ValueError("MONILITE_HOST_ROOT must include the host /proc; use the provided Compose configuration")
         psutil.PROCFS_PATH = str(proc)
     return host

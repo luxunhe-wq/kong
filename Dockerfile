@@ -4,9 +4,9 @@ FROM python:3.12-slim-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    KONG_HOST=0.0.0.0 \
-    KONG_PORT=8080 \
-    KONG_DATA_DIR=/var/lib/kong
+    MONILITE_HOST=0.0.0.0 \
+    MONILITE_PORT=8080 \
+    MONILITE_DATA_DIR=/var/lib/monilite
 
 WORKDIR /app
 COPY --from=docker_cli /usr/local/bin/docker /usr/local/bin/docker

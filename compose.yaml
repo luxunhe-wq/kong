@@ -1,8 +1,8 @@
-name: kong
+name: monilite
 
 services:
-  kong:
-    image: ${KONG_IMAGE:-kong:local}
+  monilite:
+    image: ${MONILITE_IMAGE:-${KONG_IMAGE:-monilite:local}}
     build:
       context: .
     restart: unless-stopped
@@ -22,11 +22,11 @@ services:
       - DAC_READ_SEARCH
       - SYS_PTRACE
     environment:
-      KONG_HOST: ${KONG_HOST:-0.0.0.0}
-      KONG_PORT: ${KONG_PORT:-8080}
-      KONG_HOST_ROOT: /host
-      KONG_DATA_DIR: /var/lib/kong
-      KONG_SECURE_COOKIE: ${KONG_SECURE_COOKIE:-0}
+      MONILITE_HOST: ${MONILITE_HOST:-${KONG_HOST:-0.0.0.0}}
+      MONILITE_PORT: ${MONILITE_PORT:-${KONG_PORT:-8080}}
+      MONILITE_HOST_ROOT: /host
+      MONILITE_DATA_DIR: /var/lib/monilite
+      MONILITE_SECURE_COOKIE: ${MONILITE_SECURE_COOKIE:-${KONG_SECURE_COOKIE:-0}}
     volumes:
       - type: bind
         source: /
@@ -40,7 +40,7 @@ services:
         read_only: true
         bind:
           create_host_path: false
-      - kong-data:/var/lib/kong
+      - monilite-data:/var/lib/monilite
     tmpfs:
       - /tmp:rw,noexec,nosuid,size=64m
     logging:
@@ -50,4 +50,7 @@ services:
         max-file: "3"
 
 volumes:
-  kong-data:
+  monilite-data:
+    # Set this to the old volume name when upgrading an existing deployment.
+    name: ${MONILITE_DATA_VOLUME:-${COMPOSE_PROJECT_NAME:-monilite}_monilite-data}
+    external: ${MONILITE_DATA_VOLUME_EXTERNAL:-false}

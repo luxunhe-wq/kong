@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""kong · A small, read-only Linux server monitor."""
+"""MoniLite · A small, read-only Linux server monitor."""
 import argparse
 import copy
 import json
@@ -88,9 +88,9 @@ class Monitor:
 
     def start(self):
         self.sample()
-        threading.Thread(target=self.sample_loop, daemon=True, name="kong-metrics").start()
-        threading.Thread(target=self.docker_loop, daemon=True, name="kong-docker").start()
-        threading.Thread(target=self.ports_loop, daemon=True, name="kong-ports").start()
+        threading.Thread(target=self.sample_loop, daemon=True, name="monilite-metrics").start()
+        threading.Thread(target=self.docker_loop, daemon=True, name="monilite-docker").start()
+        threading.Thread(target=self.ports_loop, daemon=True, name="monilite-ports").start()
 
     def processes(self):
         result = []
@@ -262,7 +262,8 @@ def make_handler(monitor, auth, storage=None):
             cookie = SimpleCookie()
             try:
                 cookie.load(self.headers.get("Cookie", ""))
-                token = cookie["kong_session"].value if "kong_session" in cookie else None
+                name = "monilite_session" if "monilite_session" in cookie else "kong_session"
+                token = cookie[name].value if name in cookie else None
             except CookieError:
                 token = None
             return auth.session(token)
@@ -280,8 +281,8 @@ def make_handler(monitor, auth, storage=None):
             return session
 
         def cookie(self, token=None):
-            secure = "; Secure" if os.environ.get("KONG_SECURE_COOKIE") == "1" else ""
-            return f"kong_session={token or ''}; Path=/; HttpOnly; SameSite=Lax; Max-Age={SESSION_SECONDS if token else 0}{secure}"
+            secure = "; Secure" if os.environ.get("MONILITE_SECURE_COOKIE", os.environ.get("KONG_SECURE_COOKIE")) == "1" else ""
+            return f"monilite_session={token or ''}; Path=/; HttpOnly; SameSite=Lax; Max-Age={SESSION_SECONDS if token else 0}{secure}"
 
         def check_origin(self):
             origin = self.headers.get("Origin")
@@ -448,6 +449,8 @@ def make_handler(monitor, auth, storage=None):
             self.send_header("Content-Length", str(len(content)))
             self.send_header("Cache-Control", "no-store")
             if cookie:
+                # Clear the legacy cookie on login, password changes and logout.
+                self.send_header("Set-Cookie", "kong_session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0")
                 self.send_header("Set-Cookie", cookie)
             self.end_headers()
             self.wfile.write(content)
@@ -460,16 +463,16 @@ def make_handler(monitor, auth, storage=None):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="kong server monitor")
-    parser.add_argument("--host", default=os.environ.get("KONG_HOST", "0.0.0.0"))
-    parser.add_argument("--port", type=int, default=int(os.environ.get("KONG_PORT", "8080")))
+    parser = argparse.ArgumentParser(description="MoniLite server monitor")
+    parser.add_argument("--host", default=os.environ.get("MONILITE_HOST", os.environ.get("KONG_HOST", "0.0.0.0")))
+    parser.add_argument("--port", type=int, default=int(os.environ.get("MONILITE_PORT", os.environ.get("KONG_PORT", "8080"))))
     args = parser.parse_args()
     host = configure_host()
     monitor = Monitor(host)
-    auth = AuthStore(os.environ.get("KONG_DATA_DIR", str(ROOT / "data")))
+    auth = AuthStore(os.environ.get("MONILITE_DATA_DIR", os.environ.get("KONG_DATA_DIR", str(ROOT / "data"))))
     server = ThreadingHTTPServer((args.host, args.port), make_handler(monitor, auth))
     monitor.start()
-    print(f"kong is listening on http://{args.host}:{args.port}", flush=True)
+    print(f"MoniLite is listening on http://{args.host}:{args.port}", flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

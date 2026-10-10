@@ -166,8 +166,8 @@ function handleResourceClick(event) {
   if(entry){const list=entry.dataset.entryTable==='files'?storageView.job.largest_files:storageView.job.items;const item=list[Number(entry.dataset.storageEntry)];if(item?.browseable)navigateStorage(item.path);else if(item&&!item.excluded)openStorageFile(item);return true;}
   const copy=event.target.closest('[data-copy-path]');if(copy){copyStoragePath(copy.dataset.copyPath);return true;}
   if(event.target.closest('#storage-export')) {
-    const url=URL.createObjectURL(new Blob([JSON.stringify({project:'kong',exported_at:new Date().toISOString(),analysis:storageView.job},null,2)],{type:'application/json'}));
-    const link=document.createElement('a');link.href=url;link.download=`kong-storage-${Date.now()}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('目录分析已导出');return true;
+    const url=URL.createObjectURL(new Blob([JSON.stringify({project:'MoniLite',exported_at:new Date().toISOString(),analysis:storageView.job},null,2)],{type:'application/json'}));
+    const link=document.createElement('a');link.href=url;link.download=`monilite-storage-${Date.now()}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('目录分析已导出');return true;
   }
   return false;
 }

@@ -22,7 +22,7 @@ class MonitorTests(unittest.TestCase):
         cls.directory = tempfile.TemporaryDirectory()
         cls.auth = AuthStore(cls.directory.name)
         _, token = cls.auth.setup("test_admin", "unit-test-password")
-        cls.cookie = f"kong_session={token}"
+        cls.cookie = f"monilite_session={token}"
         cls.http = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(cls.monitor, cls.auth))
         cls.thread = threading.Thread(target=cls.http.serve_forever, daemon=True)
         cls.thread.start()

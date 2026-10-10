@@ -1,16 +1,16 @@
 [Unit]
-Description=kong server resource monitor
+Description=MoniLite server resource monitor
 After=network.target docker.service
 
 [Service]
 Type=simple
-WorkingDirectory=/opt/kong
-ExecStart=/usr/bin/python3 /opt/kong/server.py --host 0.0.0.0 --port 8080
+WorkingDirectory=/opt/monilite
+ExecStart=/usr/bin/python3 /opt/monilite/server.py --host 0.0.0.0 --port 8080
 Restart=on-failure
 RestartSec=5
 Environment=PYTHONUNBUFFERED=1
-Environment=KONG_DATA_DIR=/var/lib/kong
-StateDirectory=kong
+Environment=MONILITE_DATA_DIR=/var/lib/monilite
+StateDirectory=monilite
 StateDirectoryMode=0700
 NoNewPrivileges=true
 ProtectSystem=strict

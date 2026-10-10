@@ -22,7 +22,7 @@ from server import Monitor, make_handler
 @contextmanager
 def test_server():
     # Never initialize or create accounts in the installed service while testing.
-    with tempfile.TemporaryDirectory(prefix="kong-browser-") as directory:
+    with tempfile.TemporaryDirectory(prefix="monilite-browser-") as directory:
         files=Path(directory) / 'files'
         files.mkdir()
         (files / 'logs').mkdir()
@@ -48,7 +48,7 @@ def test_server():
 def main():
     with test_server() as environment, sync_playwright() as playwright:
         BASE,FILES=environment
-        executable = os.environ.get("KONG_TEST_BROWSER")
+        executable = os.environ.get("MONILITE_TEST_BROWSER", os.environ.get("KONG_TEST_BROWSER"))
         browser = playwright.chromium.launch(headless=True, executable_path=executable, args=["--no-sandbox"])
         context = browser.new_context(viewport={"width": 1440, "height": 1000}, accept_downloads=True)
         page = context.new_page()
@@ -56,12 +56,25 @@ def main():
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto(BASE, wait_until="networkidle")
         expect(page.locator('#auth-form')).to_have_attribute('data-mode', 'setup')
+        page.evaluate("localStorage.setItem('kong.preferences', JSON.stringify({theme:'dark', interval:5}))")
+        page.reload(wait_until="networkidle")
+        assert page.evaluate("preferences.theme === 'dark' && preferences.interval === 5")
+        for width in (1440, 1100, 850, 390):
+            page.set_viewport_size({"width": width, "height": 1000})
+            assert not page.evaluate("document.documentElement.scrollWidth > innerWidth")
+            assert page.locator('.auth-story .brand').evaluate("el => el.scrollWidth <= el.clientWidth")
+        page.set_viewport_size({"width":1440,"height":1000})
+        page.evaluate("preferences.theme='light'; preferences.interval=2; document.body.classList.remove('dark'); savePreferences()")
         page.screenshot(path=str(ARTIFACTS / 'setup-desktop.png'), full_page=True)
         page.locator('#auth-username').fill('browser_owner')
         page.locator('#auth-password').fill('browser-owner-password')
         page.locator('#auth-confirm').fill('browser-owner-password')
         page.locator('#auth-form button[type="submit"]').click()
         expect(page.locator(".metric-card")).to_have_count(4)
+        for width in (1440, 1100, 850):
+            page.set_viewport_size({"width":width,"height":1000})
+            assert page.locator('.sidebar .brand').evaluate("el => el.scrollWidth <= el.clientWidth")
+        page.set_viewport_size({"width":1440,"height":1000})
         assert not page.evaluate("document.documentElement.scrollWidth > innerWidth")
         page.screenshot(path=str(ARTIFACTS / "dashboard-desktop.png"), full_page=True)
 
@@ -147,7 +160,7 @@ def main():
         page.locator('#storage-rescan').click()
         expect(page.locator('#storage-result')).to_be_visible(timeout=10000)
         expect(page.locator('#storage-table-body')).to_contain_text('late-file.bin')
-        page.locator('#storage-path').fill('/does-not-exist-kong-browser-test')
+        page.locator('#storage-path').fill('/does-not-exist-monilite-browser-test')
         page.locator('#storage-scan-button').click()
         expect(page.locator('#storage-error')).to_contain_text('目录不存在')
 
@@ -243,7 +256,7 @@ def main():
         with page.expect_download() as download_event:
             page.locator("#export-button").click()
         report = json.loads(Path(download_event.value.path()).read_text())
-        assert report["project"] == "kong" and report["memory"]["total"] > 0
+        assert report["project"] == "MoniLite" and report["memory"]["total"] > 0
         assert "docker" in report and len(report["history"]) > 0
 
         page.route("**/api/metrics?*", lambda route: route.abort())

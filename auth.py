@@ -1,4 +1,4 @@
-"""Persistent accounts, password hashing and revocable sessions for kong."""
+"""Persistent accounts, password hashing and revocable sessions for MoniLite."""
 import hashlib
 import hmac
 import os
@@ -81,7 +81,10 @@ class AuthStore:
     def __init__(self, directory):
         directory = Path(directory)
         directory.mkdir(parents=True, exist_ok=True, mode=0o700)
-        self.path = directory / "kong.sqlite3"
+        # Reuse an existing database in place, including any SQLite journal files.
+        # Renaming or copying a live database could lose accounts or sessions.
+        legacy_path = directory / "kong.sqlite3"
+        self.path = legacy_path if legacy_path.exists() else directory / "monilite.sqlite3"
         self.limiter = RateLimiter()
         with self.connection() as db:
             db.executescript("""

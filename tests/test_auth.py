@@ -3,6 +3,7 @@ import json
 import tempfile
 import threading
 import unittest
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 from http.server import ThreadingHTTPServer
 
@@ -88,6 +89,25 @@ class AuthTests(unittest.TestCase):
         self.assertEqual(sorted(statuses), [201, 409])
         with self.auth.connection() as db:
             self.assertEqual(db.execute("SELECT COUNT(*) FROM users").fetchone()[0], 1)
+
+    def test_legacy_database_preserves_accounts_and_sessions(self):
+        admin = self.setup_admin()
+        self.auth.path.rename(Path(self.directory.name) / "kong.sqlite3")
+        persisted = AuthStore(self.directory.name)
+        self.assertEqual(persisted.path.name, "kong.sqlite3")
+        self.assertTrue(persisted.status()["initialized"])
+        token = admin["cookie"].split("=", 1)[1]
+        self.assertEqual(persisted.session(token)["user"]["username"], "owner")
+        self.assertFalse((Path(self.directory.name) / "monilite.sqlite3").exists())
+
+    def test_legacy_session_is_accepted_and_revoked_on_logout(self):
+        admin = self.setup_admin()
+        self.assertTrue(admin["cookie"].startswith("monilite_session="))
+        legacy = {**admin, "cookie": admin["cookie"].replace("monilite_session=", "kong_session=")}
+        self.assertEqual(self.request("/api/metrics", session=legacy)[0], 200)
+        self.assertEqual(self.request("/api/auth/logout", "POST", {}, legacy)[0], 200)
+        self.assertEqual(self.request("/api/metrics", session=legacy)[0], 401)
+        self.assertEqual(self.request("/api/metrics", session=admin)[0], 401)
 
     def test_registration_requires_approval_and_cannot_choose_admin(self):
         admin = self.setup_admin()

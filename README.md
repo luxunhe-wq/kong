@@ -1,4 +1,4 @@
-# kong · Linux 服务器监控与 Docker 容器监控面板
+# MoniLite · Linux 服务器监控与 Docker 容器监控面板
 
 [![Tests](https://github.com/luxunhe-wq/kong/actions/workflows/ci.yml/badge.svg)](https://github.com/luxunhe-wq/kong/actions/workflows/ci.yml)
 [![Docker Compose](https://img.shields.io/badge/deploy-Docker%20Compose-2496ED?logo=docker&logoColor=white)](#快速安装)
@@ -8,7 +8,7 @@
 
 **A lightweight Linux server monitoring dashboard with real-time CPU, memory, disk, network, Docker container and port monitoring.** Built with Python, psutil and a native web UI. Deploy with Docker Compose; includes disk usage analysis, account management, dark mode and a responsive mobile dashboard.
 
-**为什么选择 kong？** 如果你维护一台个人服务器或几台小型服务器，希望用手机随时查看系统和 Docker 的运行状态，kong 提供一个安装简单、界面清晰、自带账户管理的本机监控面板。运行依赖只有 psutil，无需 Node.js、外部数据库或单独部署指标服务。
+**为什么选择 MoniLite？** 如果你维护一台个人服务器或几台小型服务器，希望用手机随时查看系统和 Docker 的运行状态，MoniLite 提供一个安装简单、界面清晰、自带账户管理的本机监控面板。运行依赖只有 psutil，无需 Node.js、外部数据库或单独部署指标服务。
 
 目前专注单机实时监控，历史保留 1 小时；多服务器汇总、长期时序存储和外部告警推送尚未实现。
 
@@ -20,12 +20,12 @@
 
 CPU、内存、磁盘与网络卡片，搭配实时趋势、系统信息和 Docker 状态。
 
-![kong Linux 服务器监控面板：CPU、内存、磁盘、网络与 Docker 实时概览](docs/screenshots/overview-light.png)
+![MoniLite Linux 服务器监控面板：CPU、内存、磁盘、网络与 Docker 实时概览](docs/screenshots/overview-light.png)
 
 <details>
 <summary>查看深色主题</summary>
 
-![kong 深色服务器监控仪表盘](docs/screenshots/overview-dark.png)
+![MoniLite 深色服务器监控仪表盘](docs/screenshots/overview-dark.png)
 
 </details>
 
@@ -50,25 +50,25 @@ CPU、内存、磁盘与网络卡片，搭配实时趋势、系统信息和 Dock
 
 ### 手机查看服务器状态
 
-<img src="docs/screenshots/overview-mobile.png" width="360" alt="kong 移动端服务器监控：手机查看 CPU、内存、磁盘和网络实时数据">
+<img src="docs/screenshots/overview-mobile.png" width="360" alt="MoniLite 移动端服务器监控：手机查看 CPU、内存、磁盘和网络实时数据">
 
 ## 部署方式
 
 | 方式 | 使用者需要什么 | 启动方式 |
 | --- | --- | --- |
 | 拉取源码并构建 | Git、Docker Engine、Docker Compose | `docker compose up -d --build` |
-| 拉取已发布镜像 | Docker Engine、Docker Compose、`compose.yaml` | 配置 `KONG_IMAGE` 后使用 `--no-build --pull always` |
+| 拉取已发布镜像 | Docker Engine、Docker Compose、`compose.yaml` | 配置 `MONILITE_IMAGE` 后使用 `--no-build --pull always` |
 | Python 直接运行 | Python 3.9+、psutil；Docker 监控还需 Docker CLI | `python3 server.py` |
 
 **现在即可使用源码构建部署。** GHCR 镜像需先完成发布并设为公开，镜像拉取步骤见 [GitHub Actions 发布镜像](#github-actions-发布镜像)。默认网页端口为 **8080**。
 
 ## 快速安装
 
-推荐在 Linux 服务器上使用 Docker Engine 和 Docker Compose 插件。项目仓库：https://github.com/luxunhe-wq/kong 。拉取源码后执行以下命令：
+推荐在 Linux 服务器上使用 Docker Engine 和 Docker Compose 插件。项目仓库：https://github.com/luxunhe-wq/kong 。项目已更名为 MoniLite，仓库地址中的旧名称暂时保留，待管理员在 GitHub Settings 中改名。拉取源码后执行以下命令：
 
 ```bash
-git clone https://github.com/luxunhe-wq/kong.git
-cd kong
+git clone https://github.com/luxunhe-wq/kong.git MoniLite
+cd MoniLite
 docker compose up -d --build
 ```
 
@@ -77,7 +77,7 @@ docker compose up -d --build
 8080 被占用时，将启动命令改为：
 
 ```bash
-KONG_PORT=9090 docker compose up -d --build
+MONILITE_PORT=9090 docker compose up -d --build
 ```
 
 此时放行 TCP 9090，访问 `http://服务器IP:9090`。常用命令：
@@ -113,12 +113,14 @@ docker compose up -d --build
 如果默认端口已被占用：
 
 ```bash
-KONG_PORT=9090 docker compose up -d --build
+MONILITE_PORT=9090 docker compose up -d --build
 ```
 
-此时访问 `http://服务器IP:9090`。使用宿主机网络模式，端口由 `KONG_PORT` 控制，无需添加 `ports` 映射。长期自定义配置可在项目目录创建 `.env`，例如 `KONG_PORT=9090`；未配置时直接使用默认值。已有原生服务占用 8080 时，请使用其他端口，不要同时启动两个服务监听同一端口。
+此时访问 `http://服务器IP:9090`。使用宿主机网络模式，端口由 `MONILITE_PORT` 控制，无需添加 `ports` 映射。长期自定义配置可在项目目录创建 `.env`，例如 `MONILITE_PORT=9090`；未配置时直接使用默认值。已有原生服务占用 8080 时，请使用其他端口，不要同时启动两个服务监听同一端口。
 
-账号数据库保存在命名数据卷 `kong_kong-data`，容器重启、更新及普通 `docker compose down` 均会保留。配置自动重启和健康检查：
+从旧版 kong 升级时，请先按[升级说明](docs/upgrading.md)停掉旧容器并指定原有数据卷，保留账号和设置。
+
+账号数据库保存在命名数据卷 `monilite_monilite-data`，容器重启、更新及普通 `docker compose down` 均会保留。配置自动重启和健康检查：
 
 ```bash
 docker compose ps
@@ -135,35 +137,35 @@ Compose 已设置宿主机 PID / 网络 / UTS 命名空间、只读宿主机根�
 
 该部署方式面向 Linux 上的 rootful Docker Engine；Docker Desktop 监控的是其 Linux 虚拟机，rootless Docker 和用户命名空间重映射不作为完整宿主机监控的支持环境。默认 Socket 路径为 `/var/run/docker.sock`。启用 SELinux 的服务器需按本机策略允许所需读取；不要对 `/` 添加 `:z` 或 `:Z` 重标记。
 
-应用仅执行查询命令，但挂载 Docker Socket 本身提供 Docker API 权限，`read_only` 挂载不会把 API 限制为只读。部署在你信任的服务器上，首次初始化在可信网络完成。通过 HTTPS 反向代理访问时设置 `KONG_SECURE_COOKIE=1`；仅 HTTP 时保持默认 `0`。可用 `KONG_HOST=127.0.0.1` 限制为本机访问。
+应用仅执行查询命令，但挂载 Docker Socket 本身提供 Docker API 权限，`read_only` 挂载不会把 API 限制为只读。部署在你信任的服务器上，首次初始化在可信网络完成。通过 HTTPS 反向代理访问时设置 `MONILITE_SECURE_COOKIE=1`；仅 HTTP 时保持默认 `0`。可用 `MONILITE_HOST=127.0.0.1` 限制为本机访问。
 
 ### 分发已构建镜像
 
-仓库提供镜像构建文件，默认构建本地镜像 `kong:local`。发布者可以给镜像添加自己的仓库地址并推送（下方 `YOUR_ACCOUNT` 为示例，需要替换）：
+仓库提供镜像构建文件，默认构建本地镜像 `monilite:local`。发布者可以给镜像添加自己的仓库地址并推送（下方 `YOUR_ACCOUNT` 为示例，需要替换）：
 
 ```bash
-docker build -t YOUR_ACCOUNT/kong:1.0.0 .
-docker push YOUR_ACCOUNT/kong:1.0.0
+docker build -t YOUR_ACCOUNT/monilite:1.0.0 .
+docker push YOUR_ACCOUNT/monilite:1.0.0
 ```
 
 镜像发布后，使用者只需下载本项目的 `compose.yaml`，无需下载源码。在该文件所在目录执行：
 
 ```bash
-KONG_IMAGE=YOUR_ACCOUNT/kong:1.0.0 docker compose up -d --no-build --pull always
+MONILITE_IMAGE=YOUR_ACCOUNT/monilite:1.0.0 docker compose up -d --no-build --pull always
 ```
 
-也可将 `KONG_IMAGE=YOUR_ACCOUNT/kong:1.0.0` 写入同目录的 `.env`，以后执行相同命令即可拉取更新并重建容器。私有镜像需先 `docker login`。本项目的 GHCR 发布地址和操作见下文；镜像发布前请使用源码构建方式。
+也可将 `MONILITE_IMAGE=YOUR_ACCOUNT/monilite:1.0.0` 写入同目录的 `.env`，以后执行相同命令即可拉取更新并重建容器。私有镜像需先 `docker login`。本项目的 GHCR 发布地址和操作见下文；镜像发布前请使用源码构建方式。
 
 也可通过离线镜像包分发，无需镜像仓库。发布者导出镜像：
 
 ```bash
-docker save kong:local | gzip > kong-image-linux-amd64.tar.gz
+docker save monilite:local | gzip > monilite-image-linux-amd64.tar.gz
 ```
 
 使用者将镜像包和 `compose.yaml` 放在同一目录，执行：
 
 ```bash
-docker load -i kong-image-linux-amd64.tar.gz
+docker load -i monilite-image-linux-amd64.tar.gz
 docker compose up -d --no-build --pull never
 ```
 
@@ -172,37 +174,37 @@ docker compose up -d --no-build --pull never
 Dockerfile 支持通过 Buildx 构建 Linux amd64 / arm64 镜像；多架构发布示例：
 
 ```bash
-docker buildx build --platform linux/amd64,linux/arm64 -t YOUR_ACCOUNT/kong:1.0.0 --push .
+docker buildx build --platform linux/amd64,linux/arm64 -t YOUR_ACCOUNT/monilite:1.0.0 --push .
 ```
 
 ### GitHub Actions 发布镜像
 
 项目包含自动测试工作流，以及发布到 GitHub Container Registry（GHCR）的多架构工作流。仓库维护者可在 GitHub 的 **Actions → Publish Docker image → Run workflow** 手动构建发布，或推送 `v1.0.0` 这样的版本标签触发发布。
 
-工作流使用 GitHub 自动提供的 `GITHUB_TOKEN`，不需要在项目中保存密码或个人令牌。发布目标为 `ghcr.io/luxunhe-wq/kong`，包含 `linux/amd64` 和 `linux/arm64`。首次发布后，在 GitHub 的 Packages 设置中将镜像包设为公开，其他人才能免登录拉取。源码仓库公开不代表镜像包自动公开。
+工作流使用 GitHub 自动提供的 `GITHUB_TOKEN`，不需要在项目中保存密码或个人令牌。发布目标为 `ghcr.io/luxunhe-wq/monilite`，包含 `linux/amd64` 和 `linux/arm64`。首次发布后，在 GitHub 的 Packages 设置中将镜像包设为公开，其他人才能免登录拉取。源码仓库公开不代表镜像包自动公开。
 
 **完成发布并设为公开后**，用户可以只下载 Compose 文件并启动，无需本机构建：
 
 ```bash
-mkdir -p kong
-cd kong
+mkdir -p MoniLite
+cd MoniLite
 curl -fL https://raw.githubusercontent.com/luxunhe-wq/kong/main/compose.yaml -o compose.yaml
-KONG_IMAGE=ghcr.io/luxunhe-wq/kong:latest docker compose up -d --no-build --pull always
+MONILITE_IMAGE=ghcr.io/luxunhe-wq/monilite:latest docker compose up -d --no-build --pull always
 ```
 
-默认访问 `http://服务器IP:8080`。如需更改端口，可在启动命令前再加 `KONG_PORT=9090`。建议将实际 `KONG_IMAGE` 和 `KONG_PORT` 保存到同目录 `.env`，以后更新执行 `docker compose up -d --no-build --pull always` 即可。镜像发布前请使用源码构建方式；ARM64 构建成功并不等同于已经在 ARM64 实机上验证全部监控功能。
+默认访问 `http://服务器IP:8080`。如需更改端口，可在启动命令前再加 `MONILITE_PORT=9090`。建议将实际 `MONILITE_IMAGE` 和 `MONILITE_PORT` 保存到同目录 `.env`，以后更新执行 `docker compose up -d --no-build --pull always` 即可。镜像发布前请使用源码构建方式；ARM64 构建成功并不等同于已经在 ARM64 实机上验证全部监控功能。
 
 ### Python 直接启动
 
 需要 Python 3.9+，支持 Linux。Docker 监控需要本机 Docker CLI 和读取 Docker 的权限。
 
 ```bash
-cd kong
+cd MoniLite
 python3 -m pip install -r requirements.txt
 python3 server.py --host 0.0.0.0 --port 8080
 ```
 
-访问 `http://服务器IP:8080`，首次访问按照引导自行设置管理员账号和密码。没有预置账户。可通过 `--host`、`--port` 或 `KONG_HOST`、`KONG_PORT` 更改监听地址。
+访问 `http://服务器IP:8080`，首次访问按照引导自行设置管理员账号和密码。没有预置账户。可通过 `--host`、`--port` 或 `MONILITE_HOST`、`MONILITE_PORT` 更改监听地址。
 
 ## 账户与权限
 
@@ -215,7 +217,7 @@ python3 server.py --host 0.0.0.0 --port 8080
 
 密码使用随机盐及 PBKDF2-SHA256（600,000 次）存储；数据库仅存储会话令牌的哈希。Cookie 为 HttpOnly、SameSite=Lax；修改接口验证 CSRF 与来源，登录接口限制尝试频率。监控 API 需要有效登录，用户管理接口额外验证管理员权限。
 
-账户与设置持久化在 SQLite 中。直接启动时默认保存在项目 `data/` 目录，可用 `KONG_DATA_DIR` 自定义；systemd 服务保存在 `/var/lib/kong/`。备份时停止服务后复制完整数据目录，恢复时保持目录权限。不要删除数据库，否则账户与初始化状态会丢失。数据目录已加入 `.gitignore`。
+账户与设置持久化在 SQLite 中。直接启动时默认保存在项目 `data/` 目录，可用 `MONILITE_DATA_DIR` 自定义；systemd 服务保存在 `/var/lib/monilite/`。备份时停止服务后复制完整数据目录，恢复时保持目录权限。不要删除数据库，否则账户与初始化状态会丢失。数据目录已加入 `.gitignore`。
 
 ## 功能
 
@@ -227,7 +229,7 @@ python3 server.py --host 0.0.0.0 --port 8080
 - **Docker**：容器搜索、状态筛选、CPU / 内存 / 网络 / 磁盘消耗、端口和详情。
 - **端口管理**：查看 TCP 监听、UDP 未连接的绑定端口和 Docker 发布映射，按协议、绑定范围、端口或服务搜索；点击查看 PID、用户、可执行文件、systemd 服务及容器归属。CPU / 内存资源详情仍保留进程占用排行。
 - **设置**：浅色 / 深色主题、刷新间隔、暂停刷新和资源提醒阈值。偏好保存在当前浏览器。
-- **项目入口**：点击 kong 标志、页脚品牌或设置中的「GitHub 项目」，在新标签页查看源码、反馈问题或收藏项目。
+- **项目入口**：点击 MoniLite 标志、页脚品牌或设置中的「GitHub 项目」，在新标签页查看源码、反馈问题或收藏项目。
 - **账户管理**：管理员初始化、登录、注册审核、用户权限及密码管理。
 - **报告**：导出包含当前指标、Docker 和历史趋势的 JSON 文件。
 
@@ -245,17 +247,17 @@ CPU 总使用率为所有逻辑核心的平均值；进程和 Docker CPU 按单�
 
 ## 后台服务
 
-本仓库提供以 `/opt/kong` 为安装目录的 systemd 示例。安装在其他目录时，先修改 `deploy/kong.service` 中的 `WorkingDirectory` 和 `ExecStart`；使用虚拟环境时将 Python 路径改成虚拟环境解释器。服务通过 `StateDirectory` 为账号数据库提供独立、可写的持久化目录。
+本仓库提供以 `/opt/monilite` 为安装目录的 systemd 示例。安装在其他目录时，先修改 `deploy/monilite.service` 中的 `WorkingDirectory` 和 `ExecStart`；使用虚拟环境时将 Python 路径改成虚拟环境解释器。服务通过 `StateDirectory` 为账号数据库提供独立、可写的持久化目录。
 
 ```bash
-sudo cp deploy/kong.service /etc/systemd/system/kong.service
+sudo cp deploy/monilite.service /etc/systemd/system/monilite.service
 sudo systemctl daemon-reload
-sudo systemctl enable --now kong
-systemctl status kong
-journalctl -u kong -f
+sudo systemctl enable --now monilite
+systemctl status monilite
+journalctl -u monilite -f
 ```
 
-需要本机和 Docker 读取权限。首次初始化在可信网络完成。公网部署使用 HTTPS 反向代理，保持原始 Host 头，并设置 `KONG_SECURE_COOKIE=1` 以启用 Secure Cookie；仅使用 HTTP 时不要开启此项。也可以仅监听 `127.0.0.1` 并通过 SSH 隧道访问。按部署需要放行 TCP 8080。
+需要本机和 Docker 读取权限。首次初始化在可信网络完成。公网部署使用 HTTPS 反向代理，保持原始 Host 头，并设置 `MONILITE_SECURE_COOKIE=1` 以启用 Secure Cookie；仅使用 HTTP 时不要开启此项。也可以仅监听 `127.0.0.1` 并通过 SSH 隧道访问。按部署需要放行 TCP 8080。
 
 ## API 与验证
 
@@ -284,7 +286,7 @@ python3 tests/browser_smoke.py
 python3 tests/browser_refresh.py
 ```
 
-可通过 `KONG_TEST_BROWSER` 指定已有 Chromium 路径。浏览器检查启动独立的临时服务器和数据库，不创建或修改实际网站账号。覆盖管理员初始化、注册审核、权限、密码和用户管理，以及监控交互、报告导出、断线恢复、手机布局与旧版浏览器兼容；截图保存在 `.runtime/`。
+可通过 `MONILITE_TEST_BROWSER` 指定已有 Chromium 路径。浏览器检查启动独立的临时服务器和数据库，不创建或修改实际网站账号。覆盖管理员初始化、注册审核、权限、密码和用户管理，以及监控交互、报告导出、断线恢复、手机布局与旧版浏览器兼容；截图保存在 `.runtime/`。
 
 `browser_refresh.py` 额外验证请求卡住、迟到响应、页面恢复与断网重连，并实际冻结浏览器页面 125 秒，确认无需重新加载即可继续更新。
 

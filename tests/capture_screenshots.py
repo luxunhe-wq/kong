@@ -1,6 +1,6 @@
 """Capture real dashboard screenshots using a temporary account and database.
 
-KONG_TEST_BROWSER=/path/to/chromium python3 tests/capture_screenshots.py
+MONILITE_TEST_BROWSER=/path/to/chromium python3 tests/capture_screenshots.py
 """
 import os
 import sys
@@ -21,7 +21,7 @@ from server import Monitor, make_handler
 def main():
     output = ROOT / 'docs' / 'screenshots'
     output.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(prefix='kong-screenshots-') as directory:
+    with tempfile.TemporaryDirectory(prefix='monilite-screenshots-') as directory:
         files = Path(directory) / 'files'
         (files / 'logs').mkdir(parents=True)
         (files / 'backups').mkdir()
@@ -38,7 +38,7 @@ def main():
         try:
             with sync_playwright() as playwright:
                 browser = playwright.chromium.launch(
-                    headless=True, executable_path=os.environ.get('KONG_TEST_BROWSER'), args=['--no-sandbox'])
+                    headless=True, executable_path=os.environ.get('MONILITE_TEST_BROWSER', os.environ.get('KONG_TEST_BROWSER')), args=['--no-sandbox'])
                 context = browser.new_context(viewport={'width':1440, 'height':1000}, device_scale_factor=1)
                 page = context.new_page()
                 errors = []

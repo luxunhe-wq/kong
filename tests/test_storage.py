@@ -109,10 +109,10 @@ class StorageAPITests(unittest.TestCase):
         (cls.root / "sample.txt").write_bytes(b"sample")
         auth = AuthStore(Path(cls.directory.name) / "auth")
         session, token = auth.setup("storage_owner", "storage-owner-password")
-        cls.admin = {"Cookie": f"kong_session={token}", "X-CSRF-Token": session["csrf_token"]}
+        cls.admin = {"Cookie": f"monilite_session={token}", "X-CSRF-Token": session["csrf_token"]}
         auth.create_user(session["user"]["id"], "storage_reader", "storage-reader-password")
         viewer, viewer_token = auth.login("storage_reader", "storage-reader-password")
-        cls.viewer = {"Cookie": f"kong_session={viewer_token}", "X-CSRF-Token": viewer["csrf_token"]}
+        cls.viewer = {"Cookie": f"monilite_session={viewer_token}", "X-CSRF-Token": viewer["csrf_token"]}
         monitor = Monitor()
         monitor.sample()
         cls.http = ThreadingHTTPServer(("127.0.0.1", 0), make_handler(monitor, auth))

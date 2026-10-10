@@ -76,7 +76,7 @@ class StorageAnalyzer:
             self.jobs[identifier] = job
             self.active = identifier
             result = self.public(job)
-            threading.Thread(target=self.scan, args=(identifier, path, info), name="kong-storage", daemon=True).start()
+            threading.Thread(target=self.scan, args=(identifier, path, info), name="monilite-storage", daemon=True).start()
             return result
 
     def public(self, job, cached=False):

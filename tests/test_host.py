@@ -1,4 +1,5 @@
 import tempfile
+import os
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -42,6 +43,12 @@ class HostTests(unittest.TestCase):
         (self.root / "loop").symlink_to("/loop")
         with self.assertRaises(OSError):
             self.host.resolve("/loop")
+
+    def test_legacy_host_root_and_new_variable_precedence(self):
+        with patch.dict(os.environ, {"KONG_HOST_ROOT": str(self.root)}, clear=True):
+            self.assertEqual(HostSystem().root, self.root)
+        with patch.dict(os.environ, {"KONG_HOST_ROOT": "/does-not-exist", "MONILITE_HOST_ROOT": str(self.root)}, clear=True):
+            self.assertEqual(HostSystem().root, self.root)
 
     def test_mounts_and_usage_are_from_host_not_container(self):
         partitions = self.host.partitions()

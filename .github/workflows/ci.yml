@@ -37,13 +37,13 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          python tests/docker_smoke.py 2>&1 | tee /tmp/kong-docker-smoke.log
+          python tests/docker_smoke.py 2>&1 | tee /tmp/monilite-docker-smoke.log
       - name: Report Docker failure
         if: failure()
         run: |
           python - <<'PY'
           from pathlib import Path
-          path = Path('/tmp/kong-docker-smoke.log')
+          path = Path('/tmp/monilite-docker-smoke.log')
           if path.exists():
               tail = '\n'.join(path.read_text().splitlines()[-80:])
               escaped = tail.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')

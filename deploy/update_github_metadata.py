@@ -26,7 +26,7 @@ def main():
 
     def request(path='', method='GET', body=None):
         headers = {'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2022-11-28',
-                   'User-Agent':'kong-repository-metadata', 'Authorization':'Bearer ' + token}
+                   'User-Agent':'monilite-repository-metadata', 'Authorization':'Bearer ' + token}
         if body is not None:
             headers['Content-Type'] = 'application/json'
         req = Request(base + path, method=method, headers=headers,

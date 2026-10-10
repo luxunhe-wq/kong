@@ -1,6 +1,6 @@
 """Refresh recovery regression checks with a temporary server and account.
 
-KONG_TEST_BROWSER=/path/to/chromium python3 tests/browser_refresh.py
+MONILITE_TEST_BROWSER=/path/to/chromium python3 tests/browser_refresh.py
 """
 import os
 import time
@@ -36,7 +36,7 @@ def restore_metrics(page):
 def main():
     with test_server() as (base, _), sync_playwright() as playwright:
         browser = playwright.chromium.launch(
-            headless=True, executable_path=os.environ.get('KONG_TEST_BROWSER'),
+            headless=True, executable_path=os.environ.get('MONILITE_TEST_BROWSER', os.environ.get('KONG_TEST_BROWSER')),
             args=['--no-sandbox'])
         context = browser.new_context()
         page = context.new_page()
